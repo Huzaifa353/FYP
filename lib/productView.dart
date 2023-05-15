@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
+import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/homeProducts.dart';
+// ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
 
 // ignore: camel_case_types
@@ -39,6 +41,7 @@ class ProductView extends StatefulWidget {
 class ProductViewState extends State<ProductView> {
   TextEditingController amount = TextEditingController();
   late String name = 'loading...';
+  late double rating = 0;
 
   @override
   void initState() {
@@ -86,6 +89,7 @@ class ProductViewState extends State<ProductView> {
 
       setState(() {
         name = user.docs.first.data()["name"];
+        rating = user.docs.first.data()["rating"].toDouble();
       });
     } catch (error) {
       print('Error fetching name: $error');
@@ -103,7 +107,7 @@ class ProductViewState extends State<ProductView> {
             child: Column(
               children: [
                 Container(
-                    padding: EdgeInsets.only(top: 53.0),
+                    padding: const EdgeInsets.only(top: 53.0),
                     height: 500.0,
                     child: Image.network(widget.image)),
                 SafeArea(
@@ -119,29 +123,38 @@ class ProductViewState extends State<ProductView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(widget.title,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 23,
                                         fontFamily: 'Nunito',
                                         fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 15),
                                 Row(
                                   children: [
-                                    CircleAvatar(
+                                    const CircleAvatar(
                                       backgroundImage:
                                           AssetImage('assets/profile.jpg'),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 10,
                                     ),
-                                    Text(name,
-                                        style: TextStyle(
-                                          fontFamily: 'Nunito',
-                                        )),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 11,
+                                        ),
+                                        Text(name,
+                                            style: const TextStyle(
+                                              fontFamily: 'Nunito',
+                                            )),
+                                        Rating(rating: rating),
+                                      ],
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Text(widget.description,
-                                    style: TextStyle(fontFamily: 'Nunito')),
+                                    style:
+                                        const TextStyle(fontFamily: 'Nunito')),
                                 const SizedBox(height: 20),
                                 Row(
                                   children: [
@@ -242,8 +255,9 @@ class ProductViewState extends State<ProductView> {
                                         borderRadius: BorderRadius.circular(15),
                                         child: TextButton(
                                           style: TextButton.styleFrom(
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 80, 232, 176)),
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 80, 232, 176)),
                                           onPressed: ((() {
                                             if (double.parse(amount.text) >
                                                 widget.currentBid) {
@@ -292,7 +306,7 @@ class ProductViewState extends State<ProductView> {
                                 ),
                                 Center(
                                   child: Container(
-                                    padding: EdgeInsets.only(top: 10.0),
+                                    padding: const EdgeInsets.only(top: 10.0),
                                     child: SizedBox(
                                       width: double.infinity,
                                       height: 52,
@@ -300,14 +314,15 @@ class ProductViewState extends State<ProductView> {
                                         borderRadius: BorderRadius.circular(15),
                                         child: TextButton(
                                           style: TextButton.styleFrom(
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 232, 80, 80)),
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 232, 80, 80)),
                                           onPressed: ((() {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    HomeProducts(),
+                                                    const HomeProducts(),
                                               ),
                                             );
                                           })),

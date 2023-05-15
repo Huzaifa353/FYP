@@ -28,11 +28,10 @@ class _LoginState extends State<Login> {
 
       // Navigate to new screen on successful login
       // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => Select(),
-        ),
+        MaterialPageRoute(builder: (context) => Select()),
+        (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       // Handle login errors here

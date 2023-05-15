@@ -110,7 +110,7 @@ class _AddProductState extends State<AddProduct> {
             foregroundColor: Colors.black87,
             shadowColor: Colors.transparent,
             leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_outlined),
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
                 onPressed: (() {
                   Navigator.pop(context);
                 }))),
@@ -122,7 +122,7 @@ class _AddProductState extends State<AddProduct> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 10),
                     alignment: Alignment.topLeft,
                     child: const Text(
                       "Add your Product",
@@ -172,12 +172,12 @@ class _AddProductState extends State<AddProduct> {
                       children: [
                         if (_imageFile != null) ...[
                           Image.file(_imageFile!),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                         ],
                         ElevatedButton.icon(
                           onPressed: _pickImage,
-                          icon: Icon(Icons.upload),
-                          label: Text('Upload Image'),
+                          icon: const Icon(Icons.upload),
+                          label: const Text('Upload Image'),
                         ),
                       ],
                     ),
@@ -224,7 +224,7 @@ class _AddProductState extends State<AddProduct> {
                               color: Color.fromARGB(255, 39, 193, 136)),
                           contentPadding: EdgeInsets.all(10),
                         ),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontFamily: 'Nunito',
                             fontWeight: FontWeight.w600,
                             height: 1.6)),
@@ -338,7 +338,7 @@ class _AddProductState extends State<AddProduct> {
                         child: TextButton(
                           style: TextButton.styleFrom(
                               backgroundColor:
-                                  Color.fromARGB(255, 80, 232, 176)),
+                                  const Color.fromARGB(255, 80, 232, 176)),
                           onPressed: (() {
                             final newProduct = Product(
                                 category: category,
@@ -353,7 +353,8 @@ class _AddProductState extends State<AddProduct> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => HomeProducts()));
+                                    builder: (context) =>
+                                        const HomeProducts()));
                           }),
                           child: const Text('Add Product',
                               style: TextStyle(
