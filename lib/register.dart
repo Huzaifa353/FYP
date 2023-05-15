@@ -1,98 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/login.dart';
-import 'package:mazdoor_pk/productList.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'dart:developer' as logDev;
-import 'package:firebase_auth/firebase_auth.dart';
+import 'User.dart' as user;
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyRegisterState createState() => _MyRegisterState();
-}
-
-class CreateUser {
-  String? id;
-  String name;
-  String email;
-  String password;
-  // String cnic;
-  //String phone;
-
-  CreateUser({
-    this.id,
-    required this.name,
-    required this.email,
-    //required this.cnic,
-    required this.password,
-    //required this.phone
-  });
-
-  setUser(String name, String email, String password) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
-    //this.phone = phone;
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'password': password,
-        //'phone': phone,
-      };
-
-  static CreateUser fromJson(Map<String, dynamic> json) => CreateUser(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      password: json['password']);
-
-  factory CreateUser.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> document) {
-    final data = document.data()!;
-
-    return CreateUser(
-      id: document.id,
-      email: data["email"],
-      password: data["password"],
-      name: data["name"],
-    );
-  }
-}
-
-Future create_user(CreateUser user) async {
-  final auth = FirebaseAuth.instance;
-
-  try {
-    final register = await auth.createUserWithEmailAndPassword(
-        email: user.email, password: user.password);
-    //final docUser = FirebaseFirestore.instance.collection("users").doc("user1");
-    final docUser = FirebaseFirestore.instance.collection("users").doc();
-    user.id = docUser.id;
-    final json = user.toJson();
-    await docUser.set(json);
-  } on FirebaseAuthException catch (e) {
-    print(e.toString());
-    print("Error registering");
-  }
-}
-
-print(final msg) {
-  logDev.log(msg);
-}
-
-Future getUserData(String email) async {
-  final snapshot = FirebaseFirestore.instance
-      .collection("users")
-      .where("email", isEqualTo: email)
-      .get();
-
-  print(snapshot);
 }
 
 class _MyRegisterState extends State<Register> {
@@ -109,7 +24,7 @@ class _MyRegisterState extends State<Register> {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-            image: AssetImage('../assets/register.png'), fit: BoxFit.cover),
+            image: AssetImage('assets/register.png'), fit: BoxFit.cover),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -236,13 +151,17 @@ class _MyRegisterState extends State<Register> {
                                     //               ProductList()));
                                     // }),
                                     onPressed: (() {
-                                      final createUser = CreateUser(
-                                          name: controlName.text,
-                                          email: controlEmail.text,
-                                          password: controlPassword.text,
-                                          id: "1");
+                                      final createUser = user.UserInfo(
+                                        name: controlName.text,
+                                        email: controlEmail.text,
+                                        password: controlPassword.text,
+                                        id: "1",
+                                        money: 0,
+                                        bio: "N\A",
+                                        job: "N\A",
+                                      );
 
-                                      create_user(createUser);
+                                      user.create_user(createUser);
 
                                       Navigator.push(
                                           context,
@@ -266,13 +185,17 @@ class _MyRegisterState extends State<Register> {
                                 style: const ButtonStyle(),
                                 child: TextButton(
                                   onPressed: (() {
-                                    final createUser = CreateUser(
-                                        name: controlName.text,
-                                        email: controlEmail.text,
-                                        password: controlPassword.text,
-                                        id: "1");
+                                    final createUser = user.UserInfo(
+                                      name: controlName.text,
+                                      email: controlEmail.text,
+                                      password: controlPassword.text,
+                                      id: "1",
+                                      money: 0,
+                                      bio: "N\A",
+                                      job: "N\A",
+                                    );
 
-                                    create_user(createUser);
+                                    user.create_user(createUser);
 
                                     Navigator.push(
                                         context,

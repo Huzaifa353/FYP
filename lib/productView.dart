@@ -35,11 +35,16 @@ class ProductView extends StatefulWidget {
   State<ProductView> createState() => ProductViewState();
 }
 
-String name = "";
-
 // ignore: camel_case_types
 class ProductViewState extends State<ProductView> {
   TextEditingController amount = TextEditingController();
+  late String name = 'loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    getName("6wXMdvbsR7zq65KsqSbI");
+  }
 
   Future<void> updateBid(double amount, double check, String _id) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -49,13 +54,14 @@ class ProductViewState extends State<ProductView> {
         .get();
 
     String userEmail = querySnapshot.docs.first.get("userEmail");
+    print(userEmail);
 
     var vari = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: userEmail)
         .get();
 
-    name = vari.docs.first.data()["name"];
+    String name = vari.docs.first.data()["name"];
 
     if (check > amount) {
       return;
@@ -70,24 +76,30 @@ class ProductViewState extends State<ProductView> {
     });
   }
 
-  Future<void> getName(String _id) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Product')
-        .where('id', isEqualTo: _id)
-        .limit(1)
-        .get();
+  Future getName(String _id) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> productSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Products')
+              .doc(_id)
+              .get();
 
-    String userEmail = querySnapshot.docs.first.get("userEmail");
+      String userEmail = productSnapshot.data()?["userEmail"];
 
-    var vari = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: userEmail)
-        .get();
+      var user = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
 
-    name = vari.docs.first.data()["name"];
+      setState(() {
+        name = user.docs.first.data()["name"];
+      });
+    } catch (error) {
+      print('Error fetching name: $error');
+    }
   }
 
-  Future<Null> getRegresh() async {
+  Future<Null> getRefresh() async {
     await Future.delayed(Duration(seconds: 3));
     setState(() {
       getName(widget.id);
@@ -101,262 +113,246 @@ class ProductViewState extends State<ProductView> {
       home: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(children: [
-          FutureBuilder(
-            future: getName(widget.id),
-            builder: (context, snapshot) {
-              return RefreshIndicator(
-                onRefresh: getRegresh,
-                child: Stack(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.only(top: 53.0),
-                        height: 500.0,
-                        child: Image.network(widget.image)),
-                    Positioned(
-                      bottom: 0,
-                      child: SafeArea(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: Card(
-                                  margin: const EdgeInsets.all(11),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(18),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(widget.title,
-                                            style: TextStyle(
-                                                fontSize: 23,
-                                                fontFamily: 'Nunito',
-                                                fontWeight: FontWeight.w600)),
-                                        const SizedBox(height: 15),
-                                        Row(
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundImage:
-                                                  AssetImage('profile.jpg'),
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(name,
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                    padding: EdgeInsets.only(top: 53.0),
+                    height: 500.0,
+                    child: Image.network(widget.image)),
+                Positioned(
+                  bottom: 0,
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Card(
+                            margin: const EdgeInsets.fromLTRB(11, 0, 11, 11),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(widget.title,
+                                      style: TextStyle(
+                                          fontSize: 23,
+                                          fontFamily: 'Nunito',
+                                          fontWeight: FontWeight.w600)),
+                                  const SizedBox(height: 15),
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage:
+                                            AssetImage('assets/profile.jpg'),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(name,
+                                          style: TextStyle(
+                                            fontFamily: 'Nunito',
+                                          )),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(widget.description,
+                                      style: TextStyle(fontFamily: 'Nunito')),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Ends in: ',
+                                        style: TextStyle(
+                                            color:
+                                                Color.fromRGBO(40, 175, 125, 1),
+                                            fontWeight: FontWeight.w900,
+                                            fontFamily: 'Nunito'),
+                                      ),
+                                      RemainingTime(timestamp: widget.time),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Current Bid: ',
+                                        style: TextStyle(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Nunito'),
+                                      ),
+                                      Text(
+                                        'PKR ${widget.actualPrice.toString()}/-',
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 20,
+                                            fontFamily: 'Nunito'),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Base Price: ',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Nunito'),
+                                      ),
+                                      Text(
+                                        widget.basePrice.toString(),
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Nunito'),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 130,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
+                                          child: TextFormField(
+                                              controller: amount,
+                                              decoration: const InputDecoration(
+                                                  border:
+                                                      UnderlineInputBorder(),
+                                                  labelText: 'Bid Amount',
+                                                  labelStyle: TextStyle(
+                                                      fontFamily: 'Nunito'))),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 25,
+                                      ),
+                                      const Text('Total Bids: ',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontFamily: 'Nunito')),
+                                      const Text('10',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontFamily: 'Nunito'))
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        height: 52,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 80, 232, 176)),
+                                            onPressed: ((() {
+                                              if (double.parse(amount.text) >
+                                                  widget.actualPrice) {
+                                                updateBid(
+                                                  double.parse(amount.text),
+                                                  widget.actualPrice,
+                                                  widget.id,
+                                                );
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ProductView(
+                                                            title: widget.title,
+                                                            description: widget
+                                                                .description,
+                                                            basePrice: widget
+                                                                .basePrice,
+                                                            actualPrice:
+                                                                double.parse(
+                                                                    amount
+                                                                        .text),
+                                                            category:
+                                                                widget.category,
+                                                            sellerEmail: widget
+                                                                .sellerEmail,
+                                                            seller:
+                                                                widget.seller,
+                                                            image: widget.image,
+                                                            time: widget.time,
+                                                            id: widget.id),
+                                                  ),
+                                                );
+                                              }
+                                            })),
+                                            child: const Text('PLACE BID',
                                                 style: TextStyle(
-                                                    fontFamily: 'Nunito')),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(widget.description,
-                                            style: TextStyle(
-                                                fontFamily: 'Nunito')),
-                                        const SizedBox(height: 20),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Ends in: ',
-                                              style: TextStyle(
-                                                  color: Color.fromRGBO(
-                                                      40, 175, 125, 1),
-                                                  fontWeight: FontWeight.w900,
-                                                  fontFamily: 'Nunito'),
-                                            ),
-                                            RemainingTime(
-                                                timestamp: widget.time),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Current Bid: ',
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Nunito'),
-                                            ),
-                                            Text(
-                                              'PKR ${widget.actualPrice.toString()}/-',
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 20,
-                                                  fontFamily: 'Nunito'),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              'Base Price: ',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Nunito'),
-                                            ),
-                                            Text(
-                                              widget.basePrice.toString(),
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: 'Nunito'),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 130,
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 10),
-                                                child: TextFormField(
-                                                    controller: amount,
-                                                    decoration: const InputDecoration(
-                                                        border:
-                                                            UnderlineInputBorder(),
-                                                        labelText: 'Bid Amount',
-                                                        labelStyle: TextStyle(
-                                                            fontFamily:
-                                                                'Nunito'))),
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 25,
-                                            ),
-                                            const Text('Total Bids: ',
-                                                style: TextStyle(
+                                                    fontFamily: 'Nunito',
                                                     color: Colors.black87,
-                                                    fontFamily: 'Nunito')),
-                                            const Text('10',
-                                                style: TextStyle(
-                                                    color: Colors.black87,
-                                                    fontFamily: 'Nunito'))
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 25,
-                                        ),
-                                        Center(
-                                          child: Container(
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              height: 52,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                child: TextButton(
-                                                  style: TextButton.styleFrom(
-                                                      backgroundColor:
-                                                          Color.fromARGB(255,
-                                                              80, 232, 176)),
-                                                  onPressed: ((() {
-                                                    if (double.parse(
-                                                            amount.text) >
-                                                        widget.actualPrice) {
-                                                      updateBid(
-                                                        double.parse(
-                                                            amount.text),
-                                                        widget.actualPrice,
-                                                        widget.id,
-                                                      );
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => ProductView(
-                                                              title: widget
-                                                                  .title,
-                                                              description: widget
-                                                                  .description,
-                                                              basePrice: widget
-                                                                  .basePrice,
-                                                              actualPrice:
-                                                                  double.parse(
-                                                                      amount
-                                                                          .text),
-                                                              category: widget
-                                                                  .category,
-                                                              sellerEmail: widget
-                                                                  .sellerEmail,
-                                                              seller:
-                                                                  widget.seller,
-                                                              image:
-                                                                  widget.image,
-                                                              time: widget.time,
-                                                              id: widget.id),
-                                                        ),
-                                                      );
-                                                    }
-                                                  })),
-                                                  child: const Text('PLACE BID',
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          color: Colors.black87,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w700)),
-                                                ),
-                                              ),
-                                            ),
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w700)),
                                           ),
                                         ),
-                                        Center(
-                                          child: Container(
-                                            padding: EdgeInsets.only(top: 10.0),
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              height: 52,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                                child: TextButton(
-                                                  style: TextButton.styleFrom(
-                                                      backgroundColor:
-                                                          Color.fromARGB(255,
-                                                              232, 80, 80)),
-                                                  onPressed: ((() {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            HomeProducts(),
-                                                      ),
-                                                    );
-                                                  })),
-                                                  child: const Text('BACK',
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          color: Colors.black87,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w700)),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  Center(
+                                    child: Container(
+                                      padding: EdgeInsets.only(top: 10.0),
+                                      child: SizedBox(
+                                        width: double.infinity,
+                                        height: 52,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                                backgroundColor: Color.fromARGB(
+                                                    255, 232, 80, 80)),
+                                            onPressed: ((() {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomeProducts(),
+                                                ),
+                                              );
+                                            })),
+                                            child: const Text('BACK',
+                                                style: TextStyle(
+                                                    fontFamily: 'Nunito',
+                                                    color: Colors.black87,
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w700)),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              );
-            },
+              ],
+            ),
           ),
           Positioned(
             top: 20,

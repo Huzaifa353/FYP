@@ -108,6 +108,7 @@ flutter:
     - assets/done.png
     - assets/login.png
     - assets/register.png
+    - assets/profile.jpg
 
   fonts:
     - family: Nunito

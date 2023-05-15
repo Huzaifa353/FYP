@@ -11,51 +11,6 @@ class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
-class UserInfo {
-  String? id;
-  String name;
-  String email;
-  String password;
-
-  UserInfo({
-    this.id,
-    required this.name,
-    required this.email,
-    required this.password,
-  });
-
-  setUserInfo(String name, String email, String password) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'email': email,
-        'password': password,
-      };
-
-  static UserInfo fromJson(Map<String, dynamic> json) => UserInfo(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      password: json['password']);
-
-  factory UserInfo.fromSnapshot(
-      DocumentSnapshot<Map<String, dynamic>> document) {
-    final data = document.data()!;
-
-    return UserInfo(
-      id: document.id,
-      email: data["email"],
-      password: data["password"],
-      name: data["name"],
-    );
-  }
-}
-
 class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
