@@ -277,7 +277,7 @@ class _ProductListState extends State<ProductList> {
                                                                               'description'],
                                                                           basePrice: product['basePrice']
                                                                               .toDouble(),
-                                                                          actualPrice: product['currentBid']
+                                                                          currentBid: product['currentBid']
                                                                               .toDouble(),
                                                                           category: product[
                                                                               'category'],
@@ -289,8 +289,8 @@ class _ProductListState extends State<ProductList> {
                                                                               'image'],
                                                                           time: product[
                                                                               'time'],
-                                                                          id: product
-                                                                              .id)));
+                                                                          productID:
+                                                                              product.id)));
                                                             },
                                                             child: const Text(
                                                                 'PLACE BID',
