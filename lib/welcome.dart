@@ -12,8 +12,7 @@ class Welcome extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(padding: EdgeInsets.all(20)),
-              Flexible(
-                  flex: 1, child: Image.network('../assets/WelcomeBG.jpg')),
+              Flexible(flex: 1, child: Image.asset('assets/WelcomeBG.jpg')),
               Padding(padding: EdgeInsets.all(20)),
               Row(children: [
                 Container(

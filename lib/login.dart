@@ -1,21 +1,96 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/register.dart';
 import 'package:mazdoor_pk/select.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
   @override
-  _MyLoginState createState() => _MyLoginState();
+  _LoginState createState() => _LoginState();
 }
 
-class _MyLoginState extends State<Login> {
+class UserInfo {
+  String? id;
+  String name;
+  String email;
+  String password;
+
+  UserInfo({
+    this.id,
+    required this.name,
+    required this.email,
+    required this.password,
+  });
+
+  setUserInfo(String name, String email, String password) {
+    this.name = name;
+    this.email = email;
+    this.password = password;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'email': email,
+        'password': password,
+      };
+
+  static UserInfo fromJson(Map<String, dynamic> json) => UserInfo(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      password: json['password']);
+
+  factory UserInfo.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data()!;
+
+    return UserInfo(
+      id: document.id,
+      email: data["email"],
+      password: data["password"],
+      name: data["name"],
+    );
+  }
+}
+
+class _LoginState extends State<Login> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  // Initialize FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Function to log in the user
+  Future<void> loginUser() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      // Navigate to new screen on successful login
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Select(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Handle login errors here
+      print('Error logging in: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-            image: AssetImage('../assets/login.png'), fit: BoxFit.cover),
+            image: AssetImage('assets/login.png'), fit: BoxFit.cover),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -40,6 +115,7 @@ class _MyLoginState extends State<Login> {
                       child: Column(
                         children: [
                           TextField(
+                            controller: _emailController,
                             style: const TextStyle(color: Colors.black),
                             decoration: InputDecoration(
                                 fillColor: Colors.grey.shade100,
@@ -53,6 +129,7 @@ class _MyLoginState extends State<Login> {
                             height: 30,
                           ),
                           TextField(
+                            controller: _passwordController,
                             style: const TextStyle(),
                             obscureText: true,
                             decoration: InputDecoration(
@@ -74,11 +151,8 @@ class _MyLoginState extends State<Login> {
                                 backgroundColor: const Color(0xff394d45),
                                 child: IconButton(
                                     color: Colors.white,
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Select()));
+                                    onPressed: () async {
+                                      loginUser();
                                     },
                                     icon: const Icon(
                                       Icons.arrow_forward,
@@ -93,19 +167,16 @@ class _MyLoginState extends State<Login> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Select()));
-                                },
+                                onPressed: () async {},
                                 style: const ButtonStyle(),
                                 child: TextButton(
                                   onPressed: (() {
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => Register()));
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Register(),
+                                      ),
+                                    );
                                   }),
                                   child: const Text(
                                     'Sign Up',

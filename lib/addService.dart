@@ -1,5 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mazdoor_pk/homeServices.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'dart:developer' as logDev;
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddService extends StatefulWidget {
   const AddService({Key? key}) : super(key: key);
@@ -8,7 +13,53 @@ class AddService extends StatefulWidget {
   _AddServiceState createState() => _AddServiceState();
 }
 
+class CreateService {
+  String? id;
+  String title;
+
+  CreateService({this.id, required this.title});
+
+  setService(String title) {
+    this.title = title;
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+      };
+
+  static CreateService fromJson(Map<String, dynamic> json) =>
+      CreateService(id: json['id'], title: json['title']);
+
+  factory CreateService.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data()!;
+
+    return CreateService(
+      id: document.id,
+      title: data["title"],
+    );
+  }
+}
+
+print(final msg) {
+  logDev.log(msg);
+}
+
+Future create_service(CreateService service) async {
+  try {
+    final docService = FirebaseFirestore.instance.collection("Service").doc();
+    service.id = docService.id;
+    final json = service.toJson();
+    await docService.set(json);
+  } on FirebaseAuthException catch (e) {
+    print(e.toString());
+    print("Error Adding Service");
+  }
+}
+
 class _AddServiceState extends State<AddService> {
+  final controlTitle = TextEditingController();
   String dropdownvalue = 'Plumber';
   DateTime _selectedDate = DateTime.now();
   // List of items in our dropdown menu
@@ -104,21 +155,22 @@ class _AddServiceState extends State<AddService> {
                 SizedBox(
                   width: double.infinity,
                   child: TextFormField(
+                      controller: controlTitle,
                       decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromARGB(255, 39, 193, 136),
-                        width: 2.0,
-                      ),
-                    ),
-                    border: OutlineInputBorder(),
-                    labelText: 'Problem Title',
-                    floatingLabelStyle: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromARGB(255, 39, 193, 136)),
-                    contentPadding: EdgeInsets.all(10),
-                  )),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 39, 193, 136),
+                            width: 2.0,
+                          ),
+                        ),
+                        border: OutlineInputBorder(),
+                        labelText: 'Problem Title',
+                        floatingLabelStyle: TextStyle(
+                            fontFamily: 'Nunito',
+                            fontWeight: FontWeight.w600,
+                            color: Color.fromARGB(255, 39, 193, 136)),
+                        contentPadding: EdgeInsets.all(10),
+                      )),
                 ),
                 const SizedBox(height: 15),
                 SizedBox(
@@ -267,7 +319,15 @@ class _AddServiceState extends State<AddService> {
                       child: TextButton(
                         style: TextButton.styleFrom(
                             backgroundColor: Color.fromARGB(255, 80, 232, 176)),
-                        onPressed: null,
+                        onPressed: (() {
+                          final newProduct =
+                              CreateService(id: "1", title: controlTitle.text);
+                          create_service(newProduct);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeServices()));
+                        }),
                         child: const Text('Post Service',
                             style: TextStyle(
                                 color: Colors.black87,
