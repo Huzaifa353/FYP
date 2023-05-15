@@ -145,12 +145,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                         ],
                       ),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 2,
-                        style: BorderStyle.solid,
-                      ),
-                      highlightElevation: 10,
+                      // borderSide: const BorderSide(
+                      //   color: Colors.black,
+                      //   width: 2,
+                      //   style: BorderStyle.solid,
+                      // ),
+                      // highlightElevation: 10,
                     ),
                   ),
                 ),
