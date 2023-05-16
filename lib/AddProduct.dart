@@ -51,6 +51,7 @@ class _AddProductState extends State<AddProduct> {
       final docProduct = FirebaseFirestore.instance.collection("Product").doc();
       product.user = auth.currentUser!.uid;
       product.userEmail = auth.currentUser!.email;
+      product.status = "running";
       String? downloadURL;
       if (_imageFile != null) {
         downloadURL = await uploadFile(_imageFile!);

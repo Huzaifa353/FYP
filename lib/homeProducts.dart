@@ -39,6 +39,7 @@ class HomeProductsState extends State<HomeProducts> {
             child: Padding(
               padding: const EdgeInsets.all(14),
               child: GNav(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 duration: const Duration(milliseconds: 500),
                 tabBackgroundColor: const Color.fromARGB(255, 80, 232, 176),
                 gap: 8,

@@ -4,6 +4,7 @@ class Product {
   String? id;
   String? user;
   String? userEmail;
+  String? status;
   String category;
   String title;
   String description;
@@ -17,6 +18,7 @@ class Product {
     this.user,
     this.userEmail,
     this.image,
+    this.status,
     required this.category,
     required this.title,
     required this.description,
@@ -49,6 +51,7 @@ class Product {
         'currentBid': currentBid,
         'image': image,
         'time': time,
+        'status': status,
       };
 
   static Product fromJson(Map<String, dynamic> json) => Product(
@@ -61,6 +64,7 @@ class Product {
         currentBid: json['currentBid'],
         image: json['image'],
         time: json['time'],
+        status: json['status'],
       );
 
   factory Product.fromSnapshot(
@@ -77,6 +81,7 @@ class Product {
         basePrice: data['basePrice'],
         currentBid: data['currentBid'],
         image: data['image'],
-        time: data['time']);
+        time: data['time'],
+        status: data['status']);
   }
 }

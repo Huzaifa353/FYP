@@ -13,7 +13,7 @@ class _ProductListState extends State<ProductList> {
     var firestore = FirebaseFirestore.instance;
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("Product")
-        .where("status", isEqualTo: "running")
+        //.where("status", isEqualTo: "running")
         .get();
     return snapshot.docs;
   }
