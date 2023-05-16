@@ -81,6 +81,7 @@ class _AddServiceState extends State<AddService> {
       final docService = FirebaseFirestore.instance.collection("Service").doc();
       service.user = auth.currentUser!.uid;
       service.userEmail = auth.currentUser!.email;
+      service.emergency = emergency;
       service.status = "running";
       String? downloadURL;
       if (_imageFile != null) {

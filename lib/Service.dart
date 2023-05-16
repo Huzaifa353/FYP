@@ -12,6 +12,7 @@ class Service {
   int? currentBid;
   String? image;
   Timestamp? time;
+  bool? emergency;
 
   Service({
     this.id,
@@ -19,6 +20,7 @@ class Service {
     this.userEmail,
     this.image,
     this.status,
+    this.emergency,
     required this.category,
     required this.title,
     required this.description,
@@ -52,6 +54,7 @@ class Service {
         'image': image,
         'time': time,
         'status': status,
+        'emergency': emergency,
       };
 
   static Service fromJson(Map<String, dynamic> json) => Service(
@@ -65,6 +68,7 @@ class Service {
         image: json['image'],
         time: json['time'],
         status: json['status'],
+        emergency: json['emergency'],
       );
 
   factory Service.fromSnapshot(
@@ -82,6 +86,7 @@ class Service {
         currentBid: data['currentBid'],
         image: data['image'],
         time: data['time'],
-        status: data['status']);
+        status: data['status'],
+        emergency: data['emergency']);
   }
 }
