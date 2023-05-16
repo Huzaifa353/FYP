@@ -24,7 +24,23 @@ class _AddProductState extends State<AddProduct> {
   String category = 'Electronics';
   DateTime _selectedDate = DateTime.now();
   // List of items in our dropdown menu
-  var items = ['Electronics', 'Home Decorations', 'Jewellery', 'Other'];
+  var items = [
+    'Electronics',
+    'Home Decorations',
+    'Jewellery',
+    'Clothing',
+    'Beauty and Personal Care',
+    'Sports and Outdoor',
+    'Automotive',
+    'Books and Magazines',
+    'Toys and Games',
+    'Health and Fitness',
+    'Furniture',
+    'Appliances',
+    'Office Supplies',
+    'Pet Supplies',
+    'Other'
+  ];
 
   Duration selectedTime = Duration(
     hours: DateTime.now().hour,

@@ -35,7 +35,7 @@ class ServicesPostedState extends State<ServicesPosted> {
                   Row(
                     children: [
                       const Padding(
-                        padding: EdgeInsets.only(top: 10.0, right: 20.0),
+                        padding: EdgeInsets.only(top: 10.0, right: 10.0),
                         child: Text('Need a Service?',
                             style: TextStyle(
                                 fontFamily: 'Nunito',

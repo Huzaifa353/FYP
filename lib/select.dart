@@ -14,60 +14,7 @@ class _SelectState extends State<Select> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    final note = [
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-    ];
-    var noteWriter = [
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir"
-    ];
-    var timings = [
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago"
-    ];
+
     return Scaffold(
         body: SafeArea(
             child: SingleChildScrollView(
@@ -102,11 +49,11 @@ class _SelectState extends State<Select> {
                           )
                         ]),
                     child: const Text(
-                      'Products',
+                      'PRODUCTS',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontFamily: 'Nunito',
-                          fontSize: 23,
+                          fontSize: 27,
                           fontWeight: FontWeight.w500,
                           height: 1.8),
                     ),
@@ -135,11 +82,11 @@ class _SelectState extends State<Select> {
                             )
                           ]),
                       child: const Text(
-                        'Services',
+                        'SERVICES',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontFamily: 'Nunito',
-                            fontSize: 23,
+                            fontSize: 27,
                             fontWeight: FontWeight.w500,
                             height: 1.8),
                       ),
