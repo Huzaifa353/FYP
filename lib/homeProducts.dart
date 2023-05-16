@@ -33,45 +33,49 @@ class HomeProductsState extends State<HomeProducts> {
             Center(child: Profile()),
           ],
         ),
-        bottomNavigationBar: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: GNav(
-              duration: const Duration(milliseconds: 500),
-              tabBackgroundColor: const Color.fromARGB(255, 80, 232, 176),
-              gap: 8,
-              tabBorderRadius: 33,
-              color: Colors.black,
-              iconSize: 23,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              activeColor: Colors.black,
-              selectedIndex: _selected_index,
-              onTabChange: (index) {
-                setState(() {
-                  _selected_index = index;
-                  _pageController.animateToPage(index,
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.ease);
-                });
-              },
-              tabs: const [
-                GButton(
-                  icon: LineIcons.home,
-                  text: 'Home',
-                ),
-                GButton(
-                  icon: LineIcons.box,
-                  text: 'Products',
-                ),
-                GButton(
-                  icon: LineIcons.bell,
-                  text: 'Notifications',
-                ),
-                GButton(
-                  icon: LineIcons.user,
-                  text: 'Profile',
-                )
-              ],
+        bottomNavigationBar: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: GNav(
+                duration: const Duration(milliseconds: 500),
+                tabBackgroundColor: const Color.fromARGB(255, 80, 232, 176),
+                gap: 8,
+                tabBorderRadius: 33,
+                color: Colors.black,
+                iconSize: 23,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                activeColor: Colors.black,
+                selectedIndex: _selected_index,
+                onTabChange: (index) {
+                  setState(() {
+                    _selected_index = index;
+                    _pageController.animateToPage(index,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.ease);
+                  });
+                },
+                tabs: const [
+                  GButton(
+                    icon: LineIcons.home,
+                    text: 'Home',
+                  ),
+                  GButton(
+                    icon: LineIcons.box,
+                    text: 'Products',
+                  ),
+                  GButton(
+                    icon: LineIcons.bell,
+                    text: 'Notifications',
+                  ),
+                  GButton(
+                    icon: LineIcons.user,
+                    text: 'Profile',
+                  )
+                ],
+              ),
             ),
           ),
         ));

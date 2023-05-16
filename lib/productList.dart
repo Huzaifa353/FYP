@@ -11,8 +11,11 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   Future getProducts() async {
     var firestore = FirebaseFirestore.instance;
-    QuerySnapshot snap = await firestore.collection("Product").get();
-    return snap.docs;
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("Product")
+        .where("status", isEqualTo: "running")
+        .get();
+    return snapshot.docs;
   }
 
   Future<Null> getRefresh() async {

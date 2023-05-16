@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
 import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/homeProducts.dart';
+import 'package:mazdoor_pk/productsPosted.dart';
 // ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
 
@@ -42,6 +44,9 @@ class ProductViewState extends State<ProductView> {
   TextEditingController amount = TextEditingController();
   late String name = 'loading...';
   late double rating = 0;
+  late bool ownProduct = false;
+  late String productID;
+  late String status = "running";
 
   @override
   void initState() {
@@ -51,36 +56,52 @@ class ProductViewState extends State<ProductView> {
 
   void initializeFirebase() {
     Firebase.initializeApp().then((value) {
-      getName(widget.productID);
+      productID = widget.productID;
+      getData();
     });
   }
 
-  Future<void> updateBid(double amount, double check, String id) async {
+  Future endBid() async {
     DocumentSnapshot<Map<String, dynamic>> productSnapshot =
-        await FirebaseFirestore.instance.collection('Product').doc(id).get();
+        await FirebaseFirestore.instance
+            .collection('Product')
+            .doc(productID)
+            .get();
+    DocumentReference productDocRef = productSnapshot.reference;
 
-    String userEmail = productSnapshot.data()?["userEmail"];
+    productDocRef.update({
+      'status': 'ended',
+    });
+  }
 
-    var vari = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: userEmail)
-        .get();
+  Future<void> updateBid(double amount, double check) async {
+    DocumentSnapshot<Map<String, dynamic>> productSnapshot =
+        await FirebaseFirestore.instance
+            .collection('Product')
+            .doc(productID)
+            .get();
 
-    name = vari.docs.first.data()["name"];
+    DocumentReference productDocRef = productSnapshot.reference;
 
-    DocumentReference userDocRef = productSnapshot.reference;
-
-    userDocRef.update({
+    productDocRef.update({
       'currentBid': amount,
     });
   }
 
-  Future<void> getName(String id) async {
+  Future<void> getData() async {
     try {
       DocumentSnapshot<Map<String, dynamic>> productSnapshot =
-          await FirebaseFirestore.instance.collection('Product').doc(id).get();
+          await FirebaseFirestore.instance
+              .collection('Product')
+              .doc(productID)
+              .get();
 
       String userEmail = productSnapshot.data()?["userEmail"];
+      String productStatus = productSnapshot.data()?["status"];
+
+      FirebaseAuth auth = FirebaseAuth.instance;
+
+      bool owner = (auth.currentUser!.email == userEmail);
 
       var user = await FirebaseFirestore.instance
           .collection('users')
@@ -90,6 +111,8 @@ class ProductViewState extends State<ProductView> {
       setState(() {
         name = user.docs.first.data()["name"];
         rating = user.docs.first.data()["rating"].toDouble();
+        ownProduct = owner;
+        status = productStatus;
       });
     } catch (error) {
       print('Error fetching name: $error');
@@ -166,7 +189,20 @@ class ProductViewState extends State<ProductView> {
                                           fontWeight: FontWeight.w900,
                                           fontFamily: 'Nunito'),
                                     ),
-                                    RemainingTime(timestamp: widget.time),
+                                    FutureBuilder(
+                                        future: getData(),
+                                        builder: (context, snapshot) {
+                                          return (status == 'running')
+                                              ? RemainingTime(
+                                                  timestamp: widget.time)
+                                              : const Text('The Bid has ended',
+                                                  style: TextStyle(
+                                                      color: Color.fromARGB(
+                                                          230, 212, 37, 37),
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      fontFamily: 'Nunito'));
+                                        }),
                                   ],
                                 ),
                                 const SizedBox(
@@ -213,97 +249,192 @@ class ProductViewState extends State<ProductView> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 130,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: TextFormField(
-                                            controller: amount,
-                                            keyboardType: TextInputType.number,
-                                            decoration: const InputDecoration(
-                                                border: UnderlineInputBorder(),
-                                                labelText: 'Bid Amount',
-                                                labelStyle: TextStyle(
-                                                    fontFamily: 'Nunito'))),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 25,
-                                    ),
-                                    const Text('Total Bids: ',
-                                        style: TextStyle(
-                                            color: Colors.black87,
-                                            fontFamily: 'Nunito')),
-                                    const Text('10',
-                                        style: TextStyle(
-                                            color: Colors.black87,
-                                            fontFamily: 'Nunito'))
-                                  ],
-                                ),
+                                !ownProduct
+                                    ? Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 130,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 10),
+                                              child: TextFormField(
+                                                  controller: amount,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  decoration: const InputDecoration(
+                                                      border:
+                                                          UnderlineInputBorder(),
+                                                      labelText: 'Bid Amount',
+                                                      labelStyle: TextStyle(
+                                                          fontFamily:
+                                                              'Nunito'))),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 25,
+                                          ),
+                                        ],
+                                      )
+                                    : Container(),
                                 const SizedBox(
                                   height: 25,
                                 ),
-                                Center(
-                                  child: Container(
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      height: 52,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(15),
-                                        child: TextButton(
-                                          style: TextButton.styleFrom(
-                                              backgroundColor:
-                                                  const Color.fromARGB(
-                                                      255, 80, 232, 176)),
-                                          onPressed: ((() {
-                                            if (double.parse(amount.text) >
-                                                widget.currentBid) {
-                                              updateBid(
-                                                double.parse(amount.text),
-                                                widget.currentBid,
-                                                widget.productID,
-                                              );
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProductView(
-                                                          title: widget.title,
-                                                          description: widget
-                                                              .description,
-                                                          basePrice: widget
-                                                              .basePrice,
-                                                          currentBid: double
-                                                              .parse(
-                                                                  amount.text),
-                                                          category: widget
-                                                              .category,
-                                                          sellerEmail:
-                                                              widget
+                                (status == 'running')
+                                    ? Center(
+                                        child: ownProduct
+                                            ? SizedBox(
+                                                width: double.infinity,
+                                                height: 52,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            const Color
+                                                                    .fromARGB(
+                                                                230,
+                                                                212,
+                                                                37,
+                                                                37)),
+                                                    onPressed: ((() {
+                                                      endBid();
+                                                      Navigator.pop(context);
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => ProductView(
+                                                              title:
+                                                                  widget.title,
+                                                              description: widget
+                                                                  .description,
+                                                              basePrice: widget
+                                                                  .basePrice,
+                                                              currentBid: widget
+                                                                  .currentBid,
+                                                              category: widget
+                                                                  .category,
+                                                              sellerEmail: widget
                                                                   .sellerEmail,
-                                                          seller: widget.seller,
-                                                          image: widget.image,
-                                                          time: widget.time,
-                                                          productID:
-                                                              widget.productID),
+                                                              seller:
+                                                                  widget.seller,
+                                                              image:
+                                                                  widget.image,
+                                                              time: widget.time,
+                                                              productID: widget
+                                                                  .productID),
+                                                        ),
+                                                      );
+                                                    })),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: const [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  right: 10.0),
+                                                          child: Icon(
+                                                            Icons
+                                                                .cancel_outlined,
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    255,
+                                                                    255,
+                                                                    255,
+                                                                    0.9),
+                                                          ),
+                                                        ),
+                                                        Text('END BID',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Nunito',
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        255,
+                                                                        255,
+                                                                        255,
+                                                                        0.9),
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700)),
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ),
-                                              );
-                                            }
-                                          })),
-                                          child: const Text('PLACE BID',
-                                              style: TextStyle(
-                                                  fontFamily: 'Nunito',
-                                                  color: Colors.black87,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w700)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                              )
+                                            : SizedBox(
+                                                width: double.infinity,
+                                                height: 52,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            const Color
+                                                                    .fromARGB(
+                                                                255,
+                                                                80,
+                                                                232,
+                                                                176)),
+                                                    onPressed: ((() {
+                                                      if (double.parse(
+                                                              amount.text) >
+                                                          widget.currentBid) {
+                                                        updateBid(
+                                                            double.parse(
+                                                                amount.text),
+                                                            widget.currentBid);
+                                                        Navigator.pop(context);
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => ProductView(
+                                                                title: widget
+                                                                    .title,
+                                                                description: widget
+                                                                    .description,
+                                                                basePrice: widget
+                                                                    .basePrice,
+                                                                currentBid:
+                                                                    double.parse(
+                                                                        amount
+                                                                            .text),
+                                                                category: widget
+                                                                    .category,
+                                                                sellerEmail: widget
+                                                                    .sellerEmail,
+                                                                seller: widget
+                                                                    .seller,
+                                                                image: widget
+                                                                    .image,
+                                                                time:
+                                                                    widget.time,
+                                                                productID: widget
+                                                                    .productID),
+                                                          ),
+                                                        );
+                                                      }
+                                                    })),
+                                                    child: const Text(
+                                                        'PLACE BID',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'Nunito',
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w700)),
+                                                  ),
+                                                ),
+                                              ),
+                                      )
+                                    : Container(),
                                 Center(
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 10.0),

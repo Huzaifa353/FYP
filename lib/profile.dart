@@ -31,7 +31,7 @@ class ProfileState extends State<Profile> {
   late String bio = "";
   late String job = "loading...";
   late double money = 0;
-  late double rating = 0;
+  late double rating = 4.5;
 
   Future<void> getData() async {
     var vari = await FirebaseFirestore.instance
