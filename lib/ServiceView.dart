@@ -81,6 +81,41 @@ class ServiceViewState extends State<ServiceView> {
     });
   }
 
+  Future<void> updateBid(double amount) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Service')
+        .where('id', isEqualTo: widget.serviceID)
+        .limit(1)
+        .get();
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    final subcollectionRef = FirebaseFirestore.instance
+        .collection('Service')
+        .doc(widget.serviceID)
+        .collection('ServiceOrders');
+
+    var nameOfBidder = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: currentUser?.email)
+        .get();
+
+    String currentName = nameOfBidder.docs.first.data()["name"];
+
+    final DocumentReference documentRef = await subcollectionRef.add({
+      'title': widget.title,
+      'userEmail': currentUser?.email,
+      'price': amount,
+      'id': widget.serviceID,
+      'status': "Not Accepted",
+      'name': currentName,
+    });
+
+    final String documentId = documentRef.id;
+
+    await documentRef.update({'id': documentId});
+  }
+
   Future getServiceOrders(snapshot) async {
     var orderRef = await snapshot.reference.collection('ServiceOrders').get();
     var serviceOrders = orderRef.docs;
@@ -426,75 +461,67 @@ class ServiceViewState extends State<ServiceView> {
                                                             ),
                                                           ),
                                                         )
-                                                      : SizedBox(
-                                                          width:
-                                                              double.infinity,
-                                                          height: 52,
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15),
-                                                            child: TextButton(
-                                                              style: TextButton.styleFrom(
-                                                                  backgroundColor:
-                                                                      const Color
+                                                      : (status == "running")
+                                                          ? SizedBox(
+                                                              width: double
+                                                                  .infinity,
+                                                              height: 52,
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                                child:
+                                                                    TextButton(
+                                                                  style: TextButton.styleFrom(
+                                                                      backgroundColor: const Color
                                                                               .fromARGB(
                                                                           255,
                                                                           80,
                                                                           232,
                                                                           176)),
-                                                              onPressed: ((() {
-                                                                Navigator.pop(
-                                                                    context);
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder: (context) => ServiceView(
-                                                                        title: widget
-                                                                            .title,
-                                                                        description: widget
-                                                                            .description,
-                                                                        basePrice: widget
-                                                                            .basePrice,
-                                                                        currentBid:
-                                                                            widget
-                                                                                .currentBid,
-                                                                        category:
-                                                                            widget
-                                                                                .category,
-                                                                        sellerEmail:
-                                                                            widget
-                                                                                .sellerEmail,
-                                                                        seller: widget
-                                                                            .seller,
-                                                                        image: widget
-                                                                            .image,
-                                                                        time: widget
-                                                                            .time,
-                                                                        serviceID:
-                                                                            widget
-                                                                                .serviceID,
-                                                                        emergency:
-                                                                            widget.emergency),
-                                                                  ),
-                                                                );
-                                                              })),
-                                                              child: const Text(
-                                                                  'PLACE BID',
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'Nunito',
-                                                                      color: Colors
-                                                                          .black87,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700)),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                                  onPressed:
+                                                                      ((() {
+                                                                    updateBid(double
+                                                                        .parse(amount
+                                                                            .text));
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    Navigator
+                                                                        .push(
+                                                                      context,
+                                                                      MaterialPageRoute(
+                                                                        builder: (context) => ServiceView(
+                                                                            title:
+                                                                                widget.title,
+                                                                            description: widget.description,
+                                                                            basePrice: widget.basePrice,
+                                                                            currentBid: widget.currentBid,
+                                                                            category: widget.category,
+                                                                            sellerEmail: widget.sellerEmail,
+                                                                            seller: widget.seller,
+                                                                            image: widget.image,
+                                                                            time: widget.time,
+                                                                            serviceID: widget.serviceID,
+                                                                            emergency: widget.emergency),
+                                                                      ),
+                                                                    );
+                                                                  })),
+                                                                  child: const Text(
+                                                                      'PLACE BID',
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'Nunito',
+                                                                          color: Colors
+                                                                              .black87,
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.w700)),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          : Container(),
                                                 )
                                               : Container(),
                                       Center(
@@ -536,6 +563,207 @@ class ServiceViewState extends State<ServiceView> {
                                     ],
                                   )))),
                     ])),
+                (status == "running" && ownProduct)
+                    ? ListView.builder(
+                        itemCount: 3,
+                        shrinkWrap: true,
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Disable scrolling
+                        itemBuilder: (context, index) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: Card(
+                                  margin: const EdgeInsets.all(11),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 15),
+                                        Row(
+                                          children: const [
+                                            CircleAvatar(
+                                              backgroundImage:
+                                                  AssetImage('profile.jpg'),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              "James Wood",
+                                              style: TextStyle(
+                                                  fontFamily: 'Nunito',
+                                                  fontSize: 18),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        const Text(
+                                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                                          style: TextStyle(
+                                              fontFamily: 'Nunito',
+                                              fontSize: 15),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          children: const [
+                                            Text(
+                                              'Offered: ',
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Nunito',
+                                                  fontSize: 15),
+                                            ),
+                                            Text(
+                                              "PKR 13,000/-",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontFamily: 'Nunito'),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 25,
+                                        ),
+                                        Container(
+                                          height: 52,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 5),
+                                          child: Row(
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ChatMessaging()));
+                                                },
+                                                child: Container(
+                                                  width: 52,
+                                                  margin: const EdgeInsets.only(
+                                                      right: 10),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              11,
+                                                              119,
+                                                              207)),
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.message,
+                                                      size: 33.0,
+                                                      color: Color.fromRGBO(
+                                                          255, 255, 255, 0.9),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: FloatingActionButton(
+                                                  elevation: 0.0,
+                                                  onPressed: () {},
+                                                  backgroundColor:
+                                                      const Color.fromARGB(
+                                                          255, 233, 233, 233),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  child: const Text(
+                                                    'Counter Offer',
+                                                    style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: 'Nunito',
+                                                        fontSize: 17),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 52,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 5),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: FloatingActionButton(
+                                                  elevation: 0.0,
+                                                  onPressed: () {},
+                                                  backgroundColor: Colors.red,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  child: const Text('Reject',
+                                                      style: TextStyle(
+                                                          color: Color.fromRGBO(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              0.9),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontFamily: 'Nunito',
+                                                          fontSize: 17)),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Expanded(
+                                                child: FloatingActionButton(
+                                                  elevation: 0.0,
+                                                  onPressed: () {},
+                                                  backgroundColor: Colors.green,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                  ),
+                                                  child: const Text('Accept',
+                                                      style: TextStyle(
+                                                          color: Color.fromRGBO(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              0.9),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontFamily: 'Nunito',
+                                                          fontSize: 17)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      )
+                    : Container(),
               ],
             ),
           ),
