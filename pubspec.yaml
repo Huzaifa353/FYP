@@ -45,6 +45,8 @@ dependencies:
   font_awesome_flutter: ^10.3.0
   grouped_list: ^4.0.0
   intl: ^0.18.0
+  provider: ^6.0.5
+  timeago: ^3.4.0
 
 dev_dependencies:
   flutter_test:
