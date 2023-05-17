@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:mazdoor_pk/login.dart';
 import 'package:mazdoor_pk/myWallet.dart';
 import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/personalInformation.dart';
+import 'package:mazdoor_pk/register.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 User? user = auth.currentUser;
@@ -43,9 +46,18 @@ class ProfileState extends State<Profile> {
       name = vari.docs.first.data()['name'];
       bio = vari.docs.first.data()['bio'];
       job = vari.docs.first.data()['job'];
-      money = vari.docs.first.data()['money'];
-      rating = vari.docs.first.data()['rating'];
+      money = vari.docs.first.data()['money'].toDouble();
+      rating = vari.docs.first.data()['rating'].toDouble();
     });
+  }
+
+  logout() {
+    FirebaseAuth.instance.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const Login()),
+      (route) => false,
+    );
   }
 
   @override
@@ -89,7 +101,7 @@ class ProfileState extends State<Profile> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(height: 10),
+                                    const SizedBox(height: 10),
                                     Text(
                                       name,
                                       style: TextStyle(
@@ -299,12 +311,7 @@ class ProfileState extends State<Profile> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                      FirebaseAuth.instance.signOut();
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Login()));
+                                      logout();
                                     },
                                     child: Row(
                                       children: const [

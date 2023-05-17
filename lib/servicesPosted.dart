@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
+import 'package:mazdoor_pk/ServiceView.dart';
 import 'package:mazdoor_pk/serviceViewSeller.dart';
 import 'package:mazdoor_pk/addService.dart';
 
@@ -229,8 +230,24 @@ class ServicesPostedState extends State<ServicesPosted> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ServiceViewSeller()));
+                                            builder: (context) => ServiceView(
+                                                title: snapshot['title'],
+                                                description:
+                                                    snapshot['description'],
+                                                basePrice: snapshot['basePrice']
+                                                    .toDouble(),
+                                                currentBid:
+                                                    snapshot['currentBid']
+                                                        .toDouble(),
+                                                category: snapshot['category'],
+                                                sellerEmail:
+                                                    snapshot['userEmail'],
+                                                seller: snapshot['user'],
+                                                image: snapshot['image'],
+                                                time: snapshot['time'],
+                                                serviceID: snapshot.id,
+                                                emergency:
+                                                    snapshot['emergency'])));
                                   },
                                   child: const Text('VIEW OFFERS',
                                       style: TextStyle(

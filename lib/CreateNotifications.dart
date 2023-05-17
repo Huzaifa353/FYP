@@ -18,6 +18,8 @@ Future<void> createNotificationExtra(
   CollectionReference mainCollectionRef =
       FirebaseFirestore.instance.collection('users');
 
+  print(buyerEmail);
+
   QuerySnapshot snapshot =
       await mainCollectionRef.where('email', isEqualTo: buyerEmail).get();
 

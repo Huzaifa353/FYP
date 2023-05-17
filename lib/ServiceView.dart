@@ -53,6 +53,7 @@ class ServiceViewState extends State<ServiceView> {
   late bool ownProduct = false;
   late String status = "running";
   late bool bidWon = false;
+  late String? currentUser;
 
   // Service Orders
   late int orderCount = 0;
@@ -79,7 +80,7 @@ class ServiceViewState extends State<ServiceView> {
 
     subDocRef.update({"status": "Accepted"});
     removeUnaccepted();
-    endBid();
+    acceptBid();
   }
 
   Future<void> reject(String _id) async {
@@ -105,6 +106,19 @@ class ServiceViewState extends State<ServiceView> {
     for (var doc in snapshots.docs) {
       await doc.reference.delete();
     }
+  }
+
+  Future acceptBid() async {
+    DocumentSnapshot<Map<String, dynamic>> serviceSnapshot =
+        await FirebaseFirestore.instance
+            .collection('Service')
+            .doc(widget.serviceID)
+            .get();
+    DocumentReference serviceDocRef = serviceSnapshot.reference;
+
+    serviceDocRef.update({
+      'status': 'accepted',
+    });
   }
 
   Future endBid() async {
@@ -183,12 +197,11 @@ class ServiceViewState extends State<ServiceView> {
 
       String userEmail = serviceSnapshot.data()?["userEmail"];
       status = serviceSnapshot.data()?["status"];
-      String? bidUser = serviceSnapshot.data()?["bidUser"];
-      if (bidUser != null) {
-        bidWon = (status == 'ended' && bidUser == auth.currentUser!.email);
-      }
+      var serviceOrders = getServiceOrders();
 
-      ownProduct = (auth.currentUser!.email == userEmail);
+      currentUser = auth.currentUser!.email;
+
+      ownProduct = (currentUser == userEmail);
 
       var user = await FirebaseFirestore.instance
           .collection('users')
@@ -198,7 +211,7 @@ class ServiceViewState extends State<ServiceView> {
       name = user.docs.first.data()["name"];
       rating = user.docs.first.data()["rating"].toDouble();
 
-      return getServiceOrders();
+      return serviceOrders;
     } catch (error) {
       print('Error fetching name: $error');
     }
@@ -245,6 +258,16 @@ class ServiceViewState extends State<ServiceView> {
                   );
                 } else {
                   var orders = snapshot.data;
+                  if (status == "accepted") {
+                    for (var order in orders) {
+                      print(order);
+                      if (order['userEmail'] == currentUser) {
+                        bidWon = true;
+                        break;
+                      }
+                    }
+                  }
+
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -340,10 +363,10 @@ class ServiceViewState extends State<ServiceView> {
                                                   ),
                                                   (status == 'running')
                                                       ? RemainingTime(
-                                                          timestamp:
-                                                              widget.time)
+                                                          timestamp: widget
+                                                              .time)
                                                       : const Text(
-                                                          'The Bid has ended',
+                                                          'The Offer has ended',
                                                           style: TextStyle(
                                                               color: Color
                                                                   .fromARGB(
@@ -385,7 +408,7 @@ class ServiceViewState extends State<ServiceView> {
                                               ),
                                               bidWon
                                                   ? const Text(
-                                                      'Congrats! You have Offer has been Accepted.',
+                                                      'Congrats! Your Offer has been Accepted.',
                                                       textAlign:
                                                           TextAlign.center,
                                                       style: TextStyle(
@@ -465,49 +488,69 @@ class ServiceViewState extends State<ServiceView> {
                                                 height: 25,
                                               ),
                                               bidWon
-                                                  ? SizedBox(
-                                                      width: double.infinity,
-                                                      height: 52,
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        child: TextButton(
-                                                          style: TextButton.styleFrom(
-                                                              backgroundColor:
-                                                                  const Color
-                                                                          .fromARGB(
-                                                                      255,
-                                                                      80,
-                                                                      232,
-                                                                      176)),
-                                                          onPressed: ((() {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
+                                                  ? GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        ChatMessaging(),
-                                                              ),
-                                                            );
-                                                          })),
-                                                          child: const Text(
-                                                              'PROCEED TO PAYMENT',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'Nunito',
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700)),
+                                                                        ChatMessaging()));
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        margin: const EdgeInsets
+                                                            .only(top: 21),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15),
+                                                            color: const Color
+                                                                    .fromARGB(
+                                                                255,
+                                                                11,
+                                                                119,
+                                                                207)),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: const [
+                                                            Icon(
+                                                              Icons.message,
+                                                              size: 33.0,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      255,
+                                                                      255,
+                                                                      255,
+                                                                      0.9),
+                                                            ),
+                                                            Text(' Message',
+                                                                style: TextStyle(
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            255,
+                                                                            255,
+                                                                            255,
+                                                                            0.9),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontFamily:
+                                                                        'Nunito',
+                                                                    fontSize:
+                                                                        17)),
+                                                          ],
                                                         ),
                                                       ),
                                                     )
                                                   : (status == 'running')
                                                       ? Center(
-                                                          child: ownProduct
+                                                          child: (ownProduct)
                                                               ? SizedBox(
                                                                   width: double
                                                                       .infinity,
@@ -641,7 +684,7 @@ class ServiceViewState extends State<ServiceView> {
                                             ],
                                           )))),
                             ])),
-                        (ownProduct)
+                        (ownProduct && status != "ended")
                             ? Column(
                                 children: [
                                   Padding(
@@ -949,27 +992,19 @@ class ServiceViewState extends State<ServiceView> {
                                                                       buttonCheck();
                                                                       if (enableButton ==
                                                                           true) {
-                                                                        // CreateNotificationsExtra(
-                                                                        //     widget
-                                                                        //         .sellerEmail,
-                                                                        //     "Service Started",
-                                                                        //     "Buyer",
-                                                                        //     "Service Started",
-                                                                        //     widget
-                                                                        //         .serviceID,
-                                                                        //     widget
-                                                                        //         .title,
-                                                                        //     widget
-                                                                        //         .category,
-                                                                        //     widget
-                                                                        //         .time,
-                                                                        //     order[
-                                                                        //         "userEmail"],
-                                                                        //     order[
-                                                                        //         "price"],
-                                                                        //     order[
-                                                                        //         "name"],
-                                                                        //     name);
+                                                                        CreateNotificationsExtra(
+                                                                            widget.sellerEmail,
+                                                                            "Your Offer has been Accepted",
+                                                                            "Buyer",
+                                                                            "Service Started",
+                                                                            widget.serviceID,
+                                                                            widget.title,
+                                                                            widget.category,
+                                                                            widget.time,
+                                                                            order["userEmail"],
+                                                                            order["price"],
+                                                                            order["name"],
+                                                                            name);
 
                                                                         accept(order[
                                                                             "id"]);
@@ -1044,7 +1079,18 @@ class ServiceViewState extends State<ServiceView> {
                                   ),
                                 ],
                               )
-                            : Container(),
+                            : (status == "ended")
+                                ? const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 15.0),
+                                    child: Text("No Offers had been Accepted",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: 'Nunito',
+                                            fontWeight: FontWeight.w600)),
+                                  )
+                                : Container(),
                       ],
                     ),
                   );
