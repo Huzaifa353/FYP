@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
 import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/homeProducts.dart';
-import 'package:mazdoor_pk/productsPosted.dart';
 // ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
 
@@ -136,7 +135,6 @@ class ProductViewState extends State<ProductView> {
               children: [
                 Container(
                     padding: const EdgeInsets.only(top: 53.0),
-                    height: 500.0,
                     child: Image.network(widget.image)),
                 SafeArea(
                   child: Column(

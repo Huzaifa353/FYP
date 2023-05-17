@@ -271,9 +271,33 @@ class _ServiceListState extends State<ServiceList> {
                                                             Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            const ServiceView()));
+                                                                    builder: (context) => ServiceView(
+                                                                        title: service[
+                                                                            'title'],
+                                                                        description: service[
+                                                                            'description'],
+                                                                        basePrice: service['basePrice']
+                                                                            .toDouble(),
+                                                                        currentBid:
+                                                                            service['currentBid']
+                                                                                .toDouble(),
+                                                                        category:
+                                                                            service[
+                                                                                'category'],
+                                                                        sellerEmail:
+                                                                            service[
+                                                                                'userEmail'],
+                                                                        seller: service[
+                                                                            'user'],
+                                                                        image: service[
+                                                                            'image'],
+                                                                        time: service[
+                                                                            'time'],
+                                                                        serviceID:
+                                                                            service
+                                                                                .id,
+                                                                        emergency:
+                                                                            service['emergency'])));
                                                           },
                                                           child: const Text(
                                                               'OFFER',

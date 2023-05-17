@@ -27,7 +27,6 @@ class ProductsPostedState extends State<ProductsPosted> {
 
   @override
   Widget build(BuildContext context) {
-    var currentServices = ['1', '2', '3'];
     return Scaffold(
       body: SafeArea(
           child: Column(

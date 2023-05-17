@@ -298,8 +298,8 @@ class ProfileState extends State<Profile> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: () async {
-                                      await FirebaseAuth.instance.signOut();
+                                    onTap: () {
+                                      FirebaseAuth.instance.signOut();
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
