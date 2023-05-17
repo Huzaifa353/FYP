@@ -928,6 +928,27 @@ class ServiceViewState extends State<ServiceView> {
                                                                         0.0,
                                                                     onPressed:
                                                                         () {
+                                                                      CreateNotificationsExtra(
+                                                                          order[
+                                                                              'userEmail'],
+                                                                          "Your Offer has been Rejected",
+                                                                          "Buyer",
+                                                                          "Service Rejected",
+                                                                          widget
+                                                                              .serviceID,
+                                                                          widget
+                                                                              .title,
+                                                                          widget
+                                                                              .category,
+                                                                          widget
+                                                                              .time,
+                                                                          widget
+                                                                              .sellerEmail,
+                                                                          order[
+                                                                              "price"],
+                                                                          name,
+                                                                          order[
+                                                                              "name"]);
                                                                       reject(order[
                                                                           'id']);
                                                                       Navigator.pop(
@@ -994,7 +1015,7 @@ class ServiceViewState extends State<ServiceView> {
                                                                           true) {
                                                                         CreateNotificationsExtra(
                                                                             widget.sellerEmail,
-                                                                            "Your Offer has been Accepted",
+                                                                            "Your Offer has Started",
                                                                             "Buyer",
                                                                             "Service Started",
                                                                             widget.serviceID,
@@ -1005,9 +1026,22 @@ class ServiceViewState extends State<ServiceView> {
                                                                             order["price"],
                                                                             order["name"],
                                                                             name);
+                                                                        CreateNotificationsExtra(
+                                                                            order['userEmail'],
+                                                                            "Your Offer has been Accepted",
+                                                                            "Buyer",
+                                                                            "Service Started",
+                                                                            widget.serviceID,
+                                                                            widget.title,
+                                                                            widget.category,
+                                                                            widget.time,
+                                                                            widget.sellerEmail,
+                                                                            order["price"],
+                                                                            name,
+                                                                            order["name"]);
 
-                                                                        accept(order[
-                                                                            "id"]);
+                                                                        //accept(order[
+                                                                        //    "id"]);
                                                                         Navigator.pop(
                                                                             context);
                                                                         Navigator

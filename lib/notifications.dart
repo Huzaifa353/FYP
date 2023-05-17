@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mazdoor_pk/NotificationBox.dart';
+import 'package:mazdoor_pk/ServiceView.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'ServiceViewSeller.dart';
 
 class Notifications extends StatefulWidget {
   @override
@@ -9,6 +11,31 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationsState extends State<Notifications> {
+  static Future<void> createNotification(
+      String email, String data, String userType, String messageType) async {
+    final _auth = FirebaseAuth.instance;
+    User? user = _auth.currentUser;
+
+    Timestamp now = Timestamp.now();
+    DateTime dateTime = now.toDate();
+    CollectionReference mainCollectionRef =
+        FirebaseFirestore.instance.collection('users');
+
+    QuerySnapshot snapshot =
+        await mainCollectionRef.where('email', isEqualTo: user?.email).get();
+
+    String docID = snapshot.docs.first.id;
+    DocumentReference docRef = mainCollectionRef.doc(docID);
+
+    docRef.collection("notification").add({
+      'data': data,
+      'sender': email,
+      'time': dateTime.toString(),
+      'user': userType,
+      'messageType': messageType,
+    });
+  }
+
   Future getData() async {
     final _auth = FirebaseAuth.instance;
     User? user = _auth.currentUser;
@@ -32,7 +59,7 @@ class _NotificationsState extends State<Notifications> {
     }
   }
 
-  Future<Null> getRefresh() async {
+  Future<Null> getRegresh() async {
     await Future.delayed(Duration(seconds: 3));
     setState(() {
       getData();
@@ -44,60 +71,7 @@ class _NotificationsState extends State<Notifications> {
     // final docs = getData();
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    final note = [
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-      "Electrician is on his way",
-      "sent you an Offer on I want a plumber to repair my basin",
-    ];
-    var noteWriter = [
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir",
-      "Ahmad Nazeer",
-      "Muhammad Yasir"
-    ];
-    var timings = [
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago",
-      "21 minutes ago",
-      "1 hour ago"
-    ];
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -129,12 +103,88 @@ class _NotificationsState extends State<Notifications> {
                           itemCount: snapshot.data.length,
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
+                            String stringTime =
+                                snapshot.data[index]["time"].toString();
+                            DateTime dateTime = DateTime.parse(stringTime);
+
+                            String timeAgo =
+                                timeago.format(dateTime, locale: 'en_short');
+
                             return GestureDetector(
-                                onTap: () {
-                                  //createNotification();
-                                },
-                                child: NotificationBox(
-                                    notification: snapshot.data[0]));
+                              onTap: () {
+                                if (snapshot.data[index]["user"] == "Buyer" &&
+                                    snapshot.data[index]["messageType"] ==
+                                        "Service Started") {
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => ServiceView(
+                                  //         serviceID: snapshot.data[index]["id"],
+                                  //         title: snapshot.data[index]["title"],
+                                  //         description: snapshot.data[index]
+                                  //             ["description"],
+                                  //         basePrice: snapshot.data[index]
+                                  //             ["totalBill"],
+                                  //         category: snapshot.data[index]
+                                  //             ["category"],
+                                  //         time: snapshot.data[index]["time"],
+                                  //         sellerEmail: snapshot.data[index]
+                                  //             ["buyerEmail"]),
+                                  //   ),
+                                  // );
+                                } else if (snapshot.data[index]["user"] ==
+                                        "Seller" &&
+                                    snapshot.data[index]["messageType"] ==
+                                        "Service Started") {}
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(15),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Color.fromARGB(
+                                                  255, 240, 240, 240),
+                                            )
+                                          ]),
+                                      child: Text.rich(
+                                        style: TextStyle(
+                                            fontFamily: 'Nunito',
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.8),
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: "$timeAgo ago",
+                                            ),
+                                            TextSpan(
+                                              text: "\n" +
+                                                  snapshot.data[index]
+                                                      ["sellerName"],
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: " - " +
+                                                  snapshot.data[index]["data"],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
                         ),
                       );

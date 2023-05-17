@@ -18,8 +18,6 @@ Future<void> createNotificationExtra(
   CollectionReference mainCollectionRef =
       FirebaseFirestore.instance.collection('users');
 
-  print(buyerEmail);
-
   QuerySnapshot snapshot =
       await mainCollectionRef.where('email', isEqualTo: buyerEmail).get();
 
@@ -35,11 +33,10 @@ Future<void> createNotificationExtra(
     'id': serviceId,
     'title': title,
     'category': category,
-    'time': time,
     'sellerEmail': sellerEmail,
     'totalBill': totalBill,
     'sellerName': sellerName,
-    'buyerName': buyerName,
+    'buyerName': buyerName
   });
 }
 
