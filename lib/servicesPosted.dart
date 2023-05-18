@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
 import 'package:mazdoor_pk/ServiceView.dart';
-import 'package:mazdoor_pk/serviceViewSeller.dart';
 import 'package:mazdoor_pk/addService.dart';
 
 class ServicesPosted extends StatefulWidget {

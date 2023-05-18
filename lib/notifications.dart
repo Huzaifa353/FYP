@@ -46,7 +46,7 @@ class _NotificationsState extends State<Notifications> {
     QuerySnapshot snapshot =
         await mainCollectionRef.where('email', isEqualTo: user?.email).get();
 
-    if (snapshot.docs.length > 0) {
+    if (snapshot.docs.isNotEmpty) {
       String docID = snapshot.docs.first.id;
 
       QuerySnapshot snap = await FirebaseFirestore.instance

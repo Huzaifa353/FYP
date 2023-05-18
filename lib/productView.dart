@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
 import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/homeProducts.dart';
+import 'package:mazdoor_pk/payment/NavBar.dart';
 // ignore: depend_on_referenced_packages
 import 'package:firebase_core/firebase_core.dart';
 
@@ -47,6 +48,8 @@ class ProductViewState extends State<ProductView> {
   late String productID;
   late String status = "running";
   late bool bidWon = false;
+  late String? currentUserEmail;
+  late String? currentUserName;
 
   @override
   void initState() {
@@ -102,7 +105,14 @@ class ProductViewState extends State<ProductView> {
 
       FirebaseAuth auth = FirebaseAuth.instance;
 
-      bool owner = (auth.currentUser!.email == userEmail);
+      currentUserEmail = auth.currentUser!.email;
+      var userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where("email", isEqualTo: currentUserEmail)
+          .get();
+
+      currentUserName = userSnapshot.docs.first['name'];
+      bool owner = (currentUserEmail == userEmail);
 
       var user = await FirebaseFirestore.instance
           .collection('users')
@@ -312,7 +322,17 @@ class ProductViewState extends State<ProductView> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      HomeProducts(),
+                                                      Payment_NavBar(
+                                                    BID: currentUserEmail!,
+                                                    SID: widget.sellerEmail,
+                                                    totalBill: widget.currentBid
+                                                        .toDouble(),
+                                                    message: 'Rate the Seller',
+                                                    category: widget.category,
+                                                    Seller_name: name,
+                                                    Buyer_name:
+                                                        currentUserName!,
+                                                  ),
                                                 ),
                                               );
                                             })),
