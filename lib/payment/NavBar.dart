@@ -6,6 +6,7 @@ import 'package:mazdoor_pk/payment/cashpayment.dart';
 import 'package:mazdoor_pk/payment/paymentCard.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:mazdoor_pk/payment/payment_completed.dart';
 
 // ignore: camel_case_types
 class Payment_NavBar extends StatefulWidget {
@@ -76,8 +77,7 @@ class Payment_NavBarState extends State<Payment_NavBar> {
             Center(child: CardPayment()),
             Center(
               child: (isPaid)
-                  ? Invoice(
-                      PID: widget.PID,
+                  ? PaymentCompleted(
                       BID: BID,
                       SID: SID,
                       totalBill: totalBill,

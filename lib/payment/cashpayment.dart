@@ -22,9 +22,9 @@ class _CashPaymentScreenState extends State<CashPaymentScreen> {
   // Define variables to store the cash amount and change due
   var BID;
   var SID;
-  late String buyer;
-  late String seller;
-  late String category;
+  String buyer = "Shamoil";
+  String seller = "Huzaifa";
+  String category = "Electronics";
   var totalBill;
   var amount_entered = 0.0;
 
@@ -232,13 +232,13 @@ class _CashPaymentScreenState extends State<CashPaymentScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => PaymentCompleted(
-                                        BID,
-                                        SID,
-                                        totalBill,
-                                        '',
-                                        category,
-                                        seller,
-                                        buyer)));
+                                        BID: BID,
+                                        SID: SID,
+                                        totalBill: totalBill,
+                                        message: '',
+                                        category: category,
+                                        Seller_name: seller,
+                                        Buyer_name: buyer)));
 
                             // Add to database  (amount_entered)
                             //

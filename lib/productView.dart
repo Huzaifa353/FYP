@@ -309,7 +309,7 @@ class ProductViewState extends State<ProductView> {
                                 const SizedBox(
                                   height: 25,
                                 ),
-                                bidWon
+                                (bidWon && !ownProduct)
                                     ? SizedBox(
                                         width: double.infinity,
                                         height: 52,

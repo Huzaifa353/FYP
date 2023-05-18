@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mazdoor_pk/WinBids.dart';
 import 'package:mazdoor_pk/login.dart';
 import 'package:mazdoor_pk/myWallet.dart';
 import 'package:mazdoor_pk/rating.dart';
@@ -238,7 +239,14 @@ class ProfileState extends State<Profile> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => WinBids(),
+                                        ),
+                                      );
+                                    },
                                     child: Row(
                                       children: const [
                                         Padding(
@@ -247,7 +255,7 @@ class ProfileState extends State<Profile> {
                                               Icons.history,
                                             )),
                                         Text(
-                                          'Transaction History',
+                                          'Active Orders',
                                           style: TextStyle(
                                               fontFamily: 'Nunito',
                                               fontWeight: FontWeight.w500),

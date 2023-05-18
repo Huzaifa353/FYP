@@ -6,14 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/AddProduct.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
 import 'package:mazdoor_pk/productView.dart';
-import 'package:mazdoor_pk/productViewSeller.dart';
 
-class ProductsPosted extends StatefulWidget {
+class WinBids extends StatefulWidget {
   @override
-  State<ProductsPosted> createState() => ProductsPostedState();
+  State<WinBids> createState() => WinBidsState();
 }
 
-class ProductsPostedState extends State<ProductsPosted> {
+class WinBidsState extends State<WinBids> {
   Future getProducts() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     var firestore = FirebaseFirestore.instance;
@@ -40,51 +39,13 @@ class ProductsPostedState extends State<ProductsPosted> {
                 Container(
                   padding: const EdgeInsets.only(top: 10),
                   child: const Text(
-                    "Your Products",
+                    "Your Won Bids",
                     style: TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 30,
                         fontFamily: 'Nunito'),
                   ),
                 ),
-                Container(
-                  width: 170,
-                  height: 60,
-                  padding: const EdgeInsets.only(top: 10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(200, 230, 230, 230),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AddProduct()));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text('Add Product',
-                              style: TextStyle(
-                                  fontFamily: 'Nunito',
-                                  color: Colors.black87,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600)),
-                          Padding(
-                            padding: EdgeInsets.only(left: 5.0),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
               ],
             ),
           ),

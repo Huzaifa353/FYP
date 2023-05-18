@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/payment/NavBar.dart';
+import 'package:mazdoor_pk/payment/RatingBar.dart';
 
 class Invoice extends StatefulWidget {
   final String BID; // BUYER ID
@@ -164,12 +165,16 @@ class _Invoice extends State<Invoice> {
                                     Seller_name: Seller_name,
                                     Buyer_name: Buyer_name)));
                       },
-                      child: const Text(
-                        'Receipt',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'Submit Feedback',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -199,7 +204,7 @@ class _Invoice extends State<Invoice> {
               _showDialog();
             },
             child: const Text(
-              'Proceed to Payment',
+              'View Reciept',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

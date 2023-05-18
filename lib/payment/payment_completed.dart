@@ -9,8 +9,14 @@ class PaymentCompleted extends StatefulWidget {
   String category = "Plumber";
   String Seller_name = "Huzaifa", Buyer_name = "Vinesh";
 
-  PaymentCompleted(this.BID, this.SID, this.totalBill, this.message,
-      this.category, this.Seller_name, this.Buyer_name);
+  PaymentCompleted(
+      {required this.BID,
+      required this.SID,
+      required this.totalBill,
+      required this.message,
+      required this.category,
+      required this.Seller_name,
+      required this.Buyer_name});
 
   @override
   State<PaymentCompleted> createState() => _PaymentCompleted(
