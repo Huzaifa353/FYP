@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/RemainingTime.dart';
+import 'package:mazdoor_pk/payment/NumberButton.dart';
+import 'package:mazdoor_pk/payment/cashpayment.dart';
 import 'package:mazdoor_pk/rating.dart';
 import 'package:mazdoor_pk/homeProducts.dart';
 import 'package:mazdoor_pk/payment/NavBar.dart';
@@ -50,6 +52,7 @@ class ProductViewState extends State<ProductView> {
   late bool bidWon = false;
   late String? currentUserEmail;
   late String? currentUserName;
+  late String? bidUser;
 
   @override
   void initState() {
@@ -101,7 +104,7 @@ class ProductViewState extends State<ProductView> {
 
       String userEmail = productSnapshot.data()?["userEmail"];
       String productStatus = productSnapshot.data()?["status"];
-      String? bidUser = productSnapshot.data()?["bidUser"];
+      bidUser = productSnapshot.data()?["bidUser"];
 
       FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -125,7 +128,8 @@ class ProductViewState extends State<ProductView> {
         ownProduct = owner;
         status = productStatus;
         if (bidUser != null) {
-          bidWon = (status == 'ended' && bidUser == auth.currentUser!.email);
+          bidWon = (status == 'ended' ||
+              status == 'paid' && bidUser == auth.currentUser!.email);
         }
       });
     } catch (error) {
@@ -323,6 +327,7 @@ class ProductViewState extends State<ProductView> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       Payment_NavBar(
+                                                    PID: widget.productID,
                                                     BID: currentUserEmail!,
                                                     SID: widget.sellerEmail,
                                                     totalBill: widget.currentBid
@@ -516,7 +521,54 @@ class ProductViewState extends State<ProductView> {
                                                     ),
                                                   ),
                                           )
-                                        : Container(),
+                                        : (ownProduct)
+                                            ? SizedBox(
+                                                width: double.infinity,
+                                                height: 52,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: TextButton(
+                                                    style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            const Color
+                                                                    .fromARGB(
+                                                                255,
+                                                                80,
+                                                                232,
+                                                                176)),
+                                                    onPressed: ((() {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  CashPaymentScreen(
+                                                                    PID: widget
+                                                                        .productID,
+                                                                    BID:
+                                                                        bidUser!,
+                                                                    SID: widget
+                                                                        .sellerEmail,
+                                                                    totalBill:
+                                                                        widget
+                                                                            .currentBid,
+                                                                  )));
+                                                    })),
+                                                    child: const Text(
+                                                        'COMPLETE CASH PAYMENT',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'Nunito',
+                                                            color:
+                                                                Colors.black87,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w700)),
+                                                  ),
+                                                ),
+                                              )
+                                            : Container(),
                                 Center(
                                   child: Container(
                                     padding: const EdgeInsets.only(top: 10.0),

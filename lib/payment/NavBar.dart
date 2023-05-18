@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mazdoor_pk/payment/Invoice.dart';
+import 'package:mazdoor_pk/payment/buyerCashPayment.dart';
 import 'package:mazdoor_pk/payment/cashpayment.dart';
 import 'package:mazdoor_pk/payment/paymentCard.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -6,6 +9,7 @@ import 'package:line_icons/line_icons.dart';
 
 // ignore: camel_case_types
 class Payment_NavBar extends StatefulWidget {
+  String PID; // BUYER ID
   String BID; // BUYER ID
   String SID; // Seller ID
   double totalBill = 0.0;
@@ -14,6 +18,7 @@ class Payment_NavBar extends StatefulWidget {
   String Seller_name = "Huzaifa", Buyer_name = "Vinesh";
 
   Payment_NavBar({
+    required this.PID,
     required this.BID,
     required this.SID,
     required this.totalBill,
@@ -36,8 +41,28 @@ class Payment_NavBarState extends State<Payment_NavBar> {
   var category;
   var Seller_name;
   var Buyer_name;
+
+  late bool isPaid = false;
   Payment_NavBarState(this.BID, this.SID, this.totalBill, this.message,
       this.category, this.Seller_name, this.Buyer_name);
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
+
+  Future getData() async {
+    var productSnapshot = await FirebaseFirestore.instance
+        .collection("Product")
+        .doc(widget.PID)
+        .get();
+
+    setState(() {
+      isPaid = (productSnapshot.data()!['status'] == 'paid');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +75,20 @@ class Payment_NavBarState extends State<Payment_NavBar> {
           children: <Widget>[
             Center(child: CardPayment()),
             Center(
-                child: CashPaymentScreen(BID, SID, totalBill, message, category,
-                    Seller_name, Buyer_name)),
+              child: (isPaid)
+                  ? Invoice(
+                      PID: widget.PID,
+                      BID: BID,
+                      SID: SID,
+                      totalBill: totalBill,
+                      message: 'Rate the Seller',
+                      category: category,
+                      Seller_name: Seller_name,
+                      Buyer_name: Buyer_name)
+                  : (WaitingScreen(
+                      totalBill) //CashPaymentScreen(BID, SID, totalBill, message, category,Seller_name, Buyer_name)
+                  ),
+            )
           ],
         ),
         bottomNavigationBar: SafeArea(

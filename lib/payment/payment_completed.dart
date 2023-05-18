@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mazdoor_pk/homeProducts.dart';
 import 'package:mazdoor_pk/payment/RatingBar.dart';
 
 class PaymentCompleted extends StatefulWidget {
@@ -47,15 +48,15 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.check_circle_rounded,
                       color: Colors.green,
                       size: 35,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 2,
                     ),
-                    Text(
+                    const Text(
                       'PAID',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -63,7 +64,7 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   'Order Details',
                   style: TextStyle(
                     fontSize: 20,
@@ -74,13 +75,13 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Date:',
                       style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       '${Date.day}/${Date.month}/${Date.year}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -91,13 +92,13 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Buyer Name:',
                       style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       widget.Buyer_name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -108,13 +109,13 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Seller Name:',
                       style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       widget.Seller_name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -125,13 +126,13 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Category:',
                       style: TextStyle(fontSize: 16),
                     ),
                     Text(
                       widget.category,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -143,7 +144,7 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                   children: [
                     Text(
                       'PKR $totalBill',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -154,40 +155,66 @@ class _PaymentCompleted extends State<PaymentCompleted> {
                   child: Divider(),
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Text(
-                      widget.message,
-                      style: TextStyle(
-                          fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                RatingBar(
-                  starCount: 5,
-                  onRatingChanged: _onRatingChanged,
-                ),
-                SizedBox(height: 10.0),
-                SizedBox(
-                  height: 40,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Color.fromRGBO(34, 205, 142, 1.0),
-                    ),
-                    onPressed: () {
-                      print(_currentRating); // add to database
-                    },
-                    child: const Text(
-                      'Submit feedback',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                (message != "")
+                    ? Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                widget.message,
+                                style: const TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10.0),
+                          RatingBar(
+                            starCount: 5,
+                            onRatingChanged: _onRatingChanged,
+                          ),
+                          const SizedBox(height: 10.0),
+                          SizedBox(
+                            height: 40,
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary:
+                                    const Color.fromRGBO(34, 205, 142, 1.0),
+                              ),
+                              onPressed: () {
+                                print(_currentRating); // add to database
+                              },
+                              child: const Text(
+                                'Submit feedback',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: const Color.fromRGBO(10, 10, 10, 1),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const HomeProducts())); // add to database
+                        },
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -206,7 +233,7 @@ class _PaymentCompleted extends State<PaymentCompleted> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Color.fromRGBO(34, 205, 142, 1.0),
+              primary: const Color.fromRGBO(34, 205, 142, 1.0),
             ),
             onPressed: () {
               _showDialog();

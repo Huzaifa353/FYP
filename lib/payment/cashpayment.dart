@@ -1,34 +1,34 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mazdoor_pk/payment/NumberButton.dart';
 import 'package:mazdoor_pk/payment/payment_completed.dart';
 
 class CashPaymentScreen extends StatefulWidget {
+  final String PID;
   final String BID, SID;
   final double totalBill;
-  String message = "Rate the seller";
-  String category = "Plumber";
-  String Seller_name = "Huzaifa", Buyer_name = "Vinesh";
-  CashPaymentScreen(this.BID, this.SID, this.totalBill, this.message,
-      this.category, this.Seller_name, this.Buyer_name);
+  CashPaymentScreen(
+      {required this.PID,
+      required this.BID,
+      required this.SID,
+      required this.totalBill});
 
   @override
-  _CashPaymentScreenState createState() => _CashPaymentScreenState(
-      BID, SID, totalBill, message, category, Seller_name, Buyer_name);
+  _CashPaymentScreenState createState() =>
+      _CashPaymentScreenState(BID, SID, totalBill);
 }
 
 class _CashPaymentScreenState extends State<CashPaymentScreen> {
   // Define variables to store the cash amount and change due
   var BID;
   var SID;
+  late String buyer;
+  late String seller;
+  late String category;
   var totalBill;
-  var message;
-  var category;
-  var Seller_name;
-  var Buyer_name;
   var amount_entered = 0.0;
 
-  _CashPaymentScreenState(this.BID, this.SID, this.totalBill, this.message,
-      this.category, this.Seller_name, this.Buyer_name);
+  _CashPaymentScreenState(this.BID, this.SID, this.totalBill);
   // Define a text field controller to handle user input
   final _textEditingController = TextEditingController();
   final _focusNode = FocusNode();
@@ -36,6 +36,38 @@ class _CashPaymentScreenState extends State<CashPaymentScreen> {
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
+  }
+
+  Future<void> Pay() async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection("Product")
+        .doc(widget.PID)
+        .get();
+
+    category = snapshot.data()?['category'] ?? "Electrician";
+
+    var productRef = snapshot.reference;
+
+    productRef.update({'status': 'paid'});
+
+    var buyerSnapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .where('email', isEqualTo: BID)
+        .get();
+    var sellerSnapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .where('email', isEqualTo: SID)
+        .get();
+
+    buyer = buyerSnapshot.docs.first['name'];
+    seller = sellerSnapshot.docs.first['name'];
+
+    double balance =
+        amount_entered - totalBill + buyerSnapshot.docs.first['money'];
+
+    var userRef = buyerSnapshot.docs.first.reference;
+
+    userRef.update({'money': balance});
   }
 
   @override
@@ -191,10 +223,11 @@ class _CashPaymentScreenState extends State<CashPaymentScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           amount_entered =
                               double.parse(_textEditingController.text);
                           if (amount_entered >= totalBill) {
+                            Pay();
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -202,15 +235,14 @@ class _CashPaymentScreenState extends State<CashPaymentScreen> {
                                         BID,
                                         SID,
                                         totalBill,
-                                        message,
+                                        '',
                                         category,
-                                        Seller_name,
-                                        Buyer_name)));
+                                        seller,
+                                        buyer)));
 
                             // Add to database  (amount_entered)
                             //
                           } else {
-                            print(amount_entered);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(

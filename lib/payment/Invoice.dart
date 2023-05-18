@@ -4,13 +4,21 @@ import 'package:mazdoor_pk/payment/NavBar.dart';
 class Invoice extends StatefulWidget {
   final String BID; // BUYER ID
   final String SID; // Seller ID
+  final String PID; // Seller ID
   final double totalBill;
   String message = "Rate the seller";
   String category = "Plumber";
   String Seller_name = "Huzaifa", Buyer_name = "Vinesh";
 
-  Invoice(this.BID, this.SID, this.totalBill, this.message, this.category,
-      this.Seller_name, this.Buyer_name);
+  Invoice(
+      {required this.SID,
+      required this.BID,
+      required this.PID,
+      required this.totalBill,
+      required this.message,
+      required this.category,
+      required this.Seller_name,
+      required this.Buyer_name});
 
   @override
   State<Invoice> createState() =>
@@ -147,6 +155,7 @@ class _Invoice extends State<Invoice> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => Payment_NavBar(
+                                    PID: widget.PID,
                                     BID: BID,
                                     SID: SID,
                                     totalBill: totalBill,
@@ -156,7 +165,7 @@ class _Invoice extends State<Invoice> {
                                     Buyer_name: Buyer_name)));
                       },
                       child: const Text(
-                        'Proceed to Payment',
+                        'Receipt',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
